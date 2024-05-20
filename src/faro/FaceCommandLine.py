@@ -350,8 +350,9 @@ def startParseOptions():
                       help="Print out more program information.")
     # parser.add_option("--service-name",type="str",dest="service_name",default=None,help="The name to be given to the service")
     # parser.add_option("--algorithm",type="str",dest="algorithm",default=None,help="the algorithm to start up")
-    parser.add_option( "--mode", type="choice", choices=['docker','venv','conda','native',None], dest="mode", default=None,
-                     help="Choose an option.")
+    environment_mode_options = ['docker','venv','conda','native',None]
+    parser.add_option( "--mode", type="choice", choices=environment_mode_options, dest="mode", default=None,
+                     help="Choose an option for an environment mode. Options: "+', '.join([str(e) for e in environment_mode_options]))
     # parser.add_option("--worker-count", type="int", dest="num_workers", default=1,
     #                   help="How many workers to start up for asyrconous usage. Default=1")
 
@@ -780,6 +781,9 @@ def face_command_line():
     # Jump to the entry point for the command.
     COMMANDS[sys.argv[1]][1]()
 
-
+def runCLI():
+    import faro
+    faro.FaceCommandLine.face_command_line()
 if __name__ == '__main__':
-    raise NotImplementedError("This main function has been removed. Please use: 'python -m faro ...'")
+    runCLI()
+    #raise NotImplementedError("This main function has been removed. Please use: 'python -m faro ...'")

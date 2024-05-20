@@ -35,10 +35,13 @@ from sortedcollections import SortedDict
 from faro.command_line.cl_common import connectToFaroClient
 tabulator = faro.util.safe_tabulator()
 tqdm = faro.util.safe_tqdm()
+hasBonjour = False
 try:
     from zeroconf import ServiceInfo,Zeroconf,ServiceBrowser
+    hasBonjour=True
 except:
     Zeroconf = None
+    hasBonjour = False
     print('Warning: could not load Bonjour services. This worker will not be broadcast. To enable broadcasting capabilities, install via `pip install zeroconf`')
 
 
@@ -68,8 +71,10 @@ def status(options):
                 print(tabulator(activeWorkers))
             else:
                 print("No actively broadcasting workers found")
-            # getRunningLocalWorkers(options)
 
+            # getRunningLocalWorkers(options)
+    print('To run a worker, use "faro start"')
+    print('e.g. faro start --algorithm arcface --service-name arcface_server --worker-count 3 --mode venv -p 0.0.0.0:50031')
 class ServiceListener:
     availableServices = SortedDict()
     availableServices_tableform = SortedDict()
@@ -128,8 +133,27 @@ def getRunningLocalWorkers(options): #no zeroconf
 
 
 def getRunningWorkers(options,asDict=False,keyedOn='Name'):
+    try:
+        from zeroconf import ServiceInfo, Zeroconf, ServiceBrowser
+        hasBonjour = True
+    except:
+        Zeroconf = None
+        hasBonjour = False
+        if options.verbose:
+            print(
+                'Warning: could not load Bonjour services. This worker will not be broadcast. To enable broadcasting capabilities, install via `pip install zeroconf`')
+
     bonjourservicesLocations = []
     if Zeroconf is not None:
+        try:
+            zeroconf = Zeroconf()
+        except Exception as e:
+            hasBonjour = 'Broken'
+            if options.verbose:
+                print('Could not start zeroconf in cl_status.py:')
+                print(e)
+            Zeroconf = None
+    if Zeroconf is not None and not hasBonjour == "Broken":
         zeroconf = Zeroconf()
         listener = ServiceListener()
         browser = ServiceBrowser(zeroconf, "_faro._tcp.local.", listener)
@@ -148,7 +172,11 @@ def getRunningWorkers(options,asDict=False,keyedOn='Name'):
         return bonjourservices
 
     else:
-        print('\nBonjour libraries are not installed.  Please perform `pip install zeroconf` to access WLAN broadcasting capabilities')
+        if hasBonjour == "Broken":
+            if options.verbose:
+                print('Bonjour cannot attach to the port, so is turned off.')
+        else:
+            print('\nBonjour libraries are not installed.  Please perform `pip install zeroconf` to access WLAN broadcasting capabilities')
         try:
             localservices = getRunningLocalWorkers(copy.copy(options))
             if asDict:

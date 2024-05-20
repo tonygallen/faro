@@ -368,37 +368,46 @@ class FaceService(fs.FaceRecognitionServicer):
     def setup_zeroconf(self,options):
         # storing network info about ourselves
         if Zeroconf is not None:
-            self.zeroconf = Zeroconf(interfaces=InterfaceChoice(2))
-            fqdn = socket.gethostname()
-            self.ip = faro.util.getHostName()
-
-            self.name = options.service_name
-            if self.name is None:
-                self.name = getRandomWord()
-            self.hostname = fqdn.split('.')[0]
-            self.port = int(options.port.split(':')[1])
-            self.external_ip = None
             try:
-                self.external_ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
-            except:
+                self.zeroconf = Zeroconf(interfaces=InterfaceChoice(2))
+                fqdn = socket.gethostname()
+                self.ip = faro.util.getHostName()
+
+                self.name = options.service_name
+                if self.name is None:
+                    self.name = getRandomWord()
+                self.hostname = fqdn.split('.')[0]
+                self.port = int(options.port.split(':')[1])
                 self.external_ip = None
+                try:
+                    self.external_ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+                except:
+                    self.external_ip = None
 
-            worker_result = self.workers.apply_async(worker_status, [])
-            status_message = worker_result.get()
+                worker_result = self.workers.apply_async(worker_status, [])
+                status_message = worker_result.get()
+
+                self.wsDesc = {'Name': self.name, 'FaRO version': str(faro.__version__),
+                               "external IP": self.external_ip, "Algorithm": str(status_message.algorithm),
+                               'functionality': options.functiondict.keys(), 'workers': str(options.worker_count)}
+                self.deviceType = "_faro"
+                self.serviceName = "_" + options.algorithm + "."
+                self.serviceSuffix = '._tcp.local.'
+                # self.wsInfo = ServiceInfo(self.broadcastType,self.broadcastName,socket.inet_aton(self.ip),self.port,0,0,self.wsDesc,self.hostname+'.local.')
+                self.wsInfo = ServiceInfo(self.deviceType + self.serviceSuffix,
+                                          self.serviceName + self.deviceType + self.serviceSuffix,
+                                          addresses=[socket.inet_aton(self.ip)], port=int(self.port),
+                                          properties=self.wsDesc,
+                                          server=self.serviceName + 'local.')
+            except Exception as e:
+                if options.verbose:
+                    print("Could not load Bonjour:", e)
+                self.zeroconf = None
 
 
-            self.wsDesc = {'Name': self.name, 'FaRO version': str(faro.__version__),"external IP":self.external_ip, "Algorithm":str(status_message.algorithm),'functionality':options.functiondict.keys(),'workers':str(options.worker_count)}
-            self.deviceType = "_faro"
-            self.serviceName = "_" + options.algorithm + "."
-            self.serviceSuffix = '._tcp.local.'
-            # self.wsInfo = ServiceInfo(self.broadcastType,self.broadcastName,socket.inet_aton(self.ip),self.port,0,0,self.wsDesc,self.hostname+'.local.')
-            self.wsInfo = ServiceInfo(self.deviceType + self.serviceSuffix,
-                                      self.serviceName + self.deviceType + self.serviceSuffix,
-                                      addresses=[socket.inet_aton(self.ip)], port=int(self.port), properties=self.wsDesc,
-                                      server=self.serviceName + 'local.')
 
     def broadcast(self):
-        if Zeroconf is not None:
+        if Zeroconf is not None and self.zeroconf is not None:
             self.zeroconf.register_service(self.wsInfo)
 
 

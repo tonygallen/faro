@@ -1,6 +1,7 @@
 LICENSE
 README.md
 setup.py
+bin/faro
 src/faro/FaceAlgorithms.py
 src/faro/FaceClient.py
 src/faro/FaceCommandLine.py

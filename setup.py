@@ -69,8 +69,13 @@ setup(name='faro',
           'protobuf>3.18.3',
           'grpcio-tools',
           'sortedcollections',
-          'h5py'
+          'h5py',
+          'tqdm',
       ],
+scripts=['bin/faro'],
+entry_points='''
+        [bin/faro]
+        ''',
 )
 
 # protobuf grpcio grpcio.tools pyvision_toolkit keras_vggface tensorflow keras==2.2.0 dlib
