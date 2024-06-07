@@ -28,6 +28,7 @@ cd $curdir
 pip install mxnet
 pip install insightface==0.1.5
 pip install h5py
+pip install numpy==1.23.5
 
 
 ./download_models.sh

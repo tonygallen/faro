@@ -23,9 +23,11 @@ cd ../../
 python setup.py install
 pip install numpy==1.23.5
 cd $curdir
-pip install -y mxnet-cu114 #change to your version of cuda (e.g. -cu90)
-pip install -y insightface==0.1.5
-pip install -y h5py
+pip install mxnet-cu114 #change to your version of cuda (e.g. -cu90)
+pip install insightface==0.1.5
+pip install h5py
+pip install numpy==1.23.5
+
 #pip uninstall -y numpy
 #pip install -y numpy==1.20
 
