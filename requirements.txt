@@ -13,7 +13,7 @@ zeroconf
 random-word
 tabulate
 sortedcollections
-opencv-python==3.4.18.65
+opencv-python
 protobuf>3.18.3
 docker
 getch

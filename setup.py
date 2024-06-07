@@ -62,7 +62,7 @@ setup(name='faro',
       install_requires=[
           'opencv-python==3.4.18.65',
           'pillow>9.3.0',
-          'numpy>1.18.5',
+          'numpy>=1.21.0,<=1.24.0', #TODO: if you are over python 3.8 you can go higher than 1.24
           'scipy',
           'scikit-image',
           'scikit-learn',
@@ -73,9 +73,9 @@ setup(name='faro',
           'tqdm',
       ],
 scripts=['bin/faro'],
-entry_points='''
-        [bin/faro]
-        ''',
+#entry_points='''
+#        [bin/faro]
+#        ''',
 )
 
 # protobuf grpcio grpcio.tools pyvision_toolkit keras_vggface tensorflow keras==2.2.0 dlib

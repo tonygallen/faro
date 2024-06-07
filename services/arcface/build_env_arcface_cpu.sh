@@ -20,7 +20,8 @@ pip install -r ../../requirements.txt
 curdir=`pwd`
 echo $curdir
 cd ../../
-python setup.py develop
+#python setup.py develop
+python -m pip install -e .
 pip install numpy==1.23.5
 
 cd $curdir
