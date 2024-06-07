@@ -22,14 +22,13 @@ echo $curdir
 cd ../../
 python setup.py develop
 #python -m pip install -e .
-pip install numpy==1.23.5
+#pip install numpy==1.23.5
 
 cd $curdir
-pip install -y mxnet
-pip install -y insightface==0.1.5
-pip install -y h5py
-pip uninstall -y numpy
-pip install -y numpy==1.20
+pip install mxnet
+pip install insightface==0.1.5
+pip install h5py
+
 
 ./download_models.sh
 
